@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# bin/compile <build-dir> <cache-dir>
+
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+cd $BUILD_DIR
+mkdir -p $BUILD_DIR/.krpano
+wget "https://s3-us-west-2.amazonaws.com/dronebase-public/krpano-1.19-pr5-linux64.tar.gz"
+cd krpano-1.19-pr5
+
+if [ KRPANO_KEY ]; then
+	echo "cd `pwd`; ./krpanotools register '`echo $KRPANO_KEY | base64 --decode --`\'" | bash
+else
+	echo "KRPANO_KEY not found. Skipping registration"
+fi
+
+mkdir -p $BUILD_DIR/.profile.d
+cat <<EOF >$BUILD_DIR/.profile.d/000_krpano.sh
+PATH=$PATH:$BUILD_DIR/.krpano/krpano-1.19-pr5
+EOF
